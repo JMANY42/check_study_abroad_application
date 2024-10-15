@@ -25,15 +25,10 @@ def send_email():
     msg['From'] = email_from
     msg['To'] = email_to
 
-    # Send the message via our own SMTP server.
     s = smtplib.SMTP('smtp.gmail.com',587)
-    # Identify yourself to an ESMTP server using EHLO
     s.ehlo()
 
-    # Secure the SMTP connection
     s.starttls()
-
-    # Login to the server (if required)
     
     s.login(email_from, password)
     s.send_message(msg)
@@ -41,18 +36,22 @@ def send_email():
 
 def main():
     interval = 60
+    driver = webdriver.Chrome()
+    driver.get("https://utdallas-ea.terradotta.com/_portal/tds-program-brochure?programid=10459")
+
     while True:
-        driver = webdriver.Chrome()
-        driver.get("https://utdallas-ea.terradotta.com/_portal/tds-program-brochure?programid=10459")
         try:
             element = WebDriverWait(driver, 15).until(
                     EC.presence_of_element_located((By.ID, "mat-tab-label-0-1"))
                 )
             element.click()
         except Exception:
-            driver.quit()
+            send_email()
+            print("failed to load "+time.ctime())
             time.sleep(interval)
+            driver.refresh()
             continue
+
         try:
             WebDriverWait(driver, 15).until(
                     EC.text_to_be_present_in_element((By.TAG_NAME, "i"),"application")
@@ -60,7 +59,6 @@ def main():
             elem = driver.find_element(By.TAG_NAME,"i")
             print(elem.text)
             text = elem.text
-            driver.quit()
 
             if(text != "There are currently no active application cycles for this program."):
                 print("open: "+time.ctime())
@@ -69,8 +67,11 @@ def main():
                 print("not open: "+time.ctime())
             time.sleep(interval)
         except Exception:
-            driver.quit()
+            send_email()
+            print("failed to load "+time.ctime())
             time.sleep(interval)
+        driver.refresh()
+
         
 
 
