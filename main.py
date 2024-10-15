@@ -40,7 +40,7 @@ def send_email():
     s.quit()
 
 def main():
-    interval = 3
+    interval = 60
     while True:
         driver = webdriver.Chrome()
         driver.get("https://utdallas-ea.terradotta.com/_portal/tds-program-brochure?programid=10459")
